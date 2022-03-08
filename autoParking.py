@@ -28,11 +28,12 @@ def main(argv):
     VColor = ""
     VPlate = ""
     phoneNum = "8884475594"
+    apartment = "The"
     #alias email
     email = "u@s.co"
     values = [FName,LName,RNum,VMake,VModel,VColor,VPlate,phoneNum,email]
     try:
-        opts,args = getopt.getopt(argv,"hi:o",["ma=","mo=","co=","pl=","e="])
+        opts,args = getopt.getopt(argv,"hi:o",["ma=","mo=","co=","pl=","e=","apt="])
     except getopt.GetoptError:
         print('options failed to load')
         sys.exit(2)      
@@ -49,6 +50,8 @@ def main(argv):
             VPlate = arg
         elif opt in '--e':
             email = arg
+        elif opt in '--apt':
+            apartment =arg
 
         #Load input forms
     driver.get("https://app.parkingbadge.com/#/guest")
@@ -69,7 +72,7 @@ def main(argv):
     phoneForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,4,1))
     emailForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,4,2))
 
-    aptForm.send_keys("Luxia Swiss Ave (Encore Swiss Avenue)")
+    aptForm.send_keys(apartment)
     firstNameForm.send_keys(values[0])
     lastNameForm.send_keys(values[1])
     unitForm.send_keys(values[2])
