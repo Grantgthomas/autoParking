@@ -99,7 +99,7 @@ def main(argv):
 
     time.sleep(random.uniform(2.000000,4.988888))
     formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[7]")
-    #formSubmit.click()
+    formSubmit.click()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
