@@ -17,9 +17,10 @@ type permitOrder struct {
 }
 
 func main() {
+	//	initDB()
 	database, err := sql.Open("sqlite3", "./autos.db")
 	if err != nil {
-		initDB()
+
 	}
 	generateQueue(database)
 
@@ -85,19 +86,6 @@ func check24hrs(evalTime string, current string) bool {
 }
 
 func executeQueue(permitQueue []permitOrder, database *sql.DB) {
-	var queryCarID string
-	var queryPermitID string
-	var queryLocation string
-	var newOrder permitOrder
-
-	rows, _ := database.Query("SELECT permit_id,car_id,location FROM permits WHERE active=0")
-	for rows.Next() {
-		rows.Scan(&queryPermitID, &queryCarID, &queryLocation)
-		newOrder.permit_id = queryPermitID
-		newOrder.location = queryLocation
-		newOrder.car_id = queryCarID
-		permitQueue = append(permitQueue, newOrder)
-	}
 	for _, order := range permitQueue {
 		runAutoparking(order.location, order.car_id, order.permit_id, database)
 	}
