@@ -17,7 +17,6 @@ type permitOrder struct {
 }
 
 func main() {
-	//	initDB()
 	database, err := sql.Open("sqlite3", "./autos.db")
 	if err != nil {
 
@@ -25,14 +24,16 @@ func main() {
 	generateQueue(database)
 
 }
+
 func generateQueue(database *sql.DB) {
 	permitQueue := make([]permitOrder, 0)
 	currentTime := time.Now().Format("01-02-2006 15:04:05")
 	var permitTime string
 	var permitID string
 	var carID string
-	var location string
+
 	var newEntry permitOrder
+	var location string
 	//check active permits to validate they are active
 	//look to see if 24 hrs has passed
 	rows, err := database.Query("SELECT permit_id,CAST(active_time AS varchar),car_id,location FROM permits WHERE active=1")
