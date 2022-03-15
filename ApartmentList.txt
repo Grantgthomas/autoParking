@@ -1,0 +1,92 @@
+<li>
+        The Annex
+        <div class="apt-address">4709 Samuel Boulevard</div></li><li>
+        The Villas at The Parks
+        <div class="apt-address">3638 Waverly Drive</div></li><li>
+        Churchill on the Park
+        <div class="apt-address">7601 Churchill Way</div></li><li>
+        The Residences at White Rock
+        <div class="apt-address">9302 Beck Ave</div></li><li>
+        The Vanderbilt
+        <div class="apt-address">2045 Estrada Parkway</div></li><li>
+        The Meadows
+        <div class="apt-address">141 Valley View Drive</div></li><li>
+        The Oakley
+        <div class="apt-address">501 Green Oaks Court</div></li><li>
+        The Standard
+        <div class="apt-address">5920 E University Blvd</div></li><li>
+        The Falls
+        <div class="apt-address">9797 Bruton Road</div></li><li>
+        The Cortona‘s
+        <div class="apt-address">325 Murry Farm Road</div></li><li>
+        The Henderson
+        <div class="apt-address">1000 Henderson Street</div></li><li>
+        The Brazos on Hulen Apartments
+        <div class="apt-address">6625 S Hulen St</div></li><li>
+        The Domain at Founders Parc
+        <div class="apt-address">880 W Euless Blvd, Euless, TX 76040, USA</div></li><li>
+        The Atlantic at Kessler Park
+        <div class="apt-address">1930 Atlantic St, Dallas, TX 75208, USA</div></li><li>
+        The Point on Hubbard
+        <div class="apt-address">4412 Chaha Rd, Garland, TX 75043, USA</div></li><li>
+        The Hills at 5400
+        <div class="apt-address">5400 Boca Raton Blvd</div></li><li>
+        Vistas On The Park
+        <div class="apt-address">1002 S Edmonds</div></li><li>
+        The Crossings 820 Heritage
+        <div class="apt-address">4151 S W Loop 820</div></li><li>
+        The Crossings 820 Chisolm
+        <div class="apt-address">4151 S W Loop 820</div></li><li>
+        The Crossings 820 Clearfork
+        <div class="apt-address">4151 S W Loop 820</div></li><li>
+        The Parks at Walnut
+        <div class="apt-address">10000 Walnut St</div></li><li>
+        The Palace Apts
+        <div class="apt-address">1601 Regency Ct</div></li><li>
+        The Standard River District
+        <div class="apt-address">5200 White Settlement Rd</div></li><li>
+        Gramercy on the park
+        <div class="apt-address">4755 Gramercy oaks dr</div></li><li>
+        The Edge at 2690 Rockbrook
+        <div class="apt-address">2690 Rockbrook</div></li><li>
+        The Springs
+        <div class="apt-address">3100 Hamilton Ave</div></li><li>
+        The Thread
+        <div class="apt-address">13606 Maham Rd</div></li><li>
+        The Kace
+        <div class="apt-address">2301 Avenue H</div></li><li>
+        The Citadel
+        <div class="apt-address">6104 LBJ FWY</div></li><li>
+        The Crossings 820 Trinity
+        <div class="apt-address">4151 S W Loop 820</div></li><li>
+        The Colony Apts
+        <div class="apt-address">3321 Coker St</div></li><li>
+        The Interlace Apts
+        <div class="apt-address">3801 Gannon Ln</div></li><li>
+        Bellevue at the Bluffs
+        <div class="apt-address">3900 west nw hwy</div></li><li>
+        THE STRAN
+        <div class="apt-address">5307 Gaston Ave.</div></li><li>
+        THE OAKS
+        <div class="apt-address">4919 Gaston Ave.</div></li><li>
+        ATHENIAN
+        <div class="apt-address">4918 Gaston Ave.</div></li><li>
+        THE 5600
+        <div class="apt-address">5602 Gaston Ave.</div></li><li>
+        The Oaks of North Dallas
+        <div class="apt-address">4701 Haverwood Ln</div></li><li>
+        The Mark at Weatherford
+        <div class="apt-address">172 College Park Dr</div></li><li>
+        THE AMBASSADOR APTS
+        <div class="apt-address">5027 Live Oak St.</div></li><li>
+        The Elise
+        <div class="apt-address">1720 John West Rd</div></li><li>
+        The Link
+        <div class="apt-address">9450 forest springs Dr dallas tx</div></li><li>
+        The Bristols Apts
+        <div class="apt-address">825 Norwood Dr</div></li><li>
+        Encore Panther Island
+        <div class="apt-address">447 North Main St</div></li><li>
+        The Jane @ Preston Trails
+        <div class="apt-address">320 W Pleasant Run Rd</div></li>
+	Luxia Swiss Ave

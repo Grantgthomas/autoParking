@@ -1,3 +1,4 @@
+from ast import Pass
 from decimal import DivisionByZero
 from multiprocessing.connection import deliver_challenge, wait
 from operator import truediv
@@ -16,9 +17,11 @@ import getopt
 
 def main(argv):
     # set path to driver
-   
+ #  options = webdriver.ChromeOptions()
+  #  options.add_experimental_option("detach", True)
     #set browser to use
     driver = webdriver.Chrome("C:\Program Files (x86)\chromedriver.exe")
+
     #declare a string to represent path to form on website
     FName = "Karolina"
     LName = "Frankfurt"
@@ -28,7 +31,7 @@ def main(argv):
     VColor = ""
     VPlate = ""
     phoneNum = "8884475594"
-    apartment = "The"
+    apartment = ""
     #alias email
     email = "u@s.co"
     values = [FName,LName,RNum,VMake,VModel,VColor,VPlate,phoneNum,email]
@@ -82,6 +85,7 @@ def main(argv):
     plateForm.send_keys(VPlate)
     phoneForm.send_keys(values[7])
     emailForm.send_keys(email)
+    time.sleep(random.uniform(2.000000,4.988888))
     try:
         aptSelect = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/form/div[1]/div/div/div/ul"))
@@ -100,6 +104,9 @@ def main(argv):
     time.sleep(random.uniform(2.000000,4.988888))
     formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[7]")
     formSubmit.click()
+    while(True):
+        Pass
+    
 
 if __name__ == "__main__":
     main(sys.argv[1:])
