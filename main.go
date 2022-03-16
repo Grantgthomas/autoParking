@@ -20,7 +20,7 @@ func main() {
 	var userOption string
 	var run bool
 	run = true
-	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nView Cars\nView Apartments\nQuit")
+	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Cars\nView Apartments\nQuit")
 
 	database, err := sql.Open("sqlite3", "./autos.db")
 	if err != nil {
@@ -32,29 +32,86 @@ func main() {
 		switch userOption {
 		case "make":
 			generateQueue(database)
-		case "add":
+		case "add car":
 			err := addCar(database)
 			if err != nil {
 				fmt.Println(err)
 			}
+		case "add permit":
+
 		case "view cars":
-
+			err := viewEntry(database, "view cars")
+			if err != nil {
+				fmt.Println(err)
+			}
 		case "view apartments":
-
+			err := viewEntry(database, "view apartments")
+			if err != nil {
+				fmt.Println(err)
+			}
 		case "quit":
 			run = false
 		default:
 			println("Invalid Option")
-			println("Valid Options Are:\nmake\nadd\nview cars\nview apartments\nquit")
+			println("Valid Options Are:\nmake\nadd car\nadd permit\nview cars\nview apartments\nquit")
 		}
 	}
 
 }
-func viewEntry(database *sql.DB, option string) {
+func viewEntry(database *sql.DB, option string) error {
 	if option == "view cars" {
+		var ownerName string
+		var carID string
+		var make string
+		var model string
+		var color string
+		var plate string
+		fmt.Println("Type an owner name to view their cars or type 'all' to view all cars")
+		fmt.Scanln(ownerName)
+		if ownerName == "all" {
+			rows, err := database.Query("SELECT CAST(car_id AS varchar),make,model,color,plate FROM cars")
+			if err != nil {
+				return err
+			}
+			for rows.Next() {
+				rows.Scan(&carID, &make, &model, &color, &plate)
+				fmt.Println("[" + carID + " | " + carID + " | " + make + " | " + model + " | " + color + " | " + plate + "]")
+			}
+		} else {
+			rows, err := database.Query("SELECT car_id,make,model,color,plate FROM cars WHERE ownerFname=" + ownerName)
+			if err != nil {
+				return err
+			}
+			for rows.Next() {
+				rows.Scan(&carID, &make, &model, &color, &plate)
+				fmt.Println("[" + carID + " | " + carID + " | " + make + " | " + model + " | " + color + " | " + plate + "]")
+			}
+		}
 
+	} else if option == "view apartments" {
+		var apartmentName string
+		var apt_id string
+		rows, err := database.Query("SELECT CAST(apt_id AS VARCHAR),apt_name FROM apartments WHERE apt_name NOT NULL")
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+			rows.Scan(&apt_id, &apartmentName)
+			fmt.Println("[" + apt_id + " | " + apartmentName + "]")
+		}
 	}
+	return nil
 }
+func addPermit(database *sql.DB) {
+	var carID string
+	var location string
+	fmt.Println("Enter the ID of the car:")
+	fmt.Scanln(&carID)
+	fmt.Println("Enter the location for the permit:")
+	fmt.Scanln(&location)
+
+}
+
 func addCar(database *sql.DB) error {
 	var make string
 	var model string
