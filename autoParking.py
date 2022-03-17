@@ -1,4 +1,3 @@
-from ast import Pass
 from decimal import DivisionByZero
 from multiprocessing.connection import deliver_challenge, wait
 from operator import truediv
@@ -17,11 +16,9 @@ import getopt
 
 def main(argv):
     # set path to driver
- #  options = webdriver.ChromeOptions()
-  #  options.add_experimental_option("detach", True)
+   
     #set browser to use
     driver = webdriver.Chrome("C:\Program Files (x86)\chromedriver.exe")
-
     #declare a string to represent path to form on website
     FName = "Karolina"
     LName = "Frankfurt"
@@ -104,8 +101,9 @@ def main(argv):
     time.sleep(random.uniform(2.000000,4.988888))
     formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[7]")
     formSubmit.click()
-    while(True):
-        Pass
+    time.sleep(random.uniform(2.000000,4.988888))
+    formSubmit.click()
+    time.sleep(10)
     
 
 if __name__ == "__main__":
