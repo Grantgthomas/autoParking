@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strconv"
+
+	//	"sync"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -17,16 +19,20 @@ type permitOrder struct {
 }
 
 func main() {
-	var userOption string
-	var run bool
-	run = true
-	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Cars\nView Apartments\nQuit")
 
 	database, err := sql.Open("sqlite3", "./autos.db")
 	if err != nil {
 		fmt.Println(err)
 	}
-	generateQueue(database)
+	menu(database)
+
+}
+
+func menu(database *sql.DB) {
+	var userOption string
+	var run bool
+	run = true
+	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Cars\nView Apartments\nQuit")
 	for run {
 		fmt.Println("Please enter an option")
 		fmt.Scanln(&userOption)
@@ -57,7 +63,6 @@ func main() {
 			println("Valid Options Are:\n(m) make permits\n(ac) add car\n(ap) add permit\n(vc) view cars\n(va) view apartments\n(q) quit")
 		}
 	}
-
 }
 func viewEntry(database *sql.DB, option string) error {
 	if option == "view cars" {
@@ -233,6 +238,7 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 	var queryPlate string
 	var email string
 	var email_id string
+	currentTime := time.Now().Format("01-02-2006 15:04:05")
 	//query data base to get vehichle info
 	row, _ := database.Query("SELECT email_id,address FROM email WHERE email_id=1")
 	row.Next()
@@ -257,6 +263,6 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 		}
 		//set the permit to active after running auto parking
 		//may add some additonal checking to see if this actually works later
-		database.Exec("UPDATE permits SET active=1 WHERE permit_id=" + permit_id)
+		database.Exec("UPDATE permits SET active_time=?,active=1 WHERE permit_id=?", currentTime, carID)
 	}
 }
