@@ -32,6 +32,7 @@ func menu(database *sql.DB) {
 	var userOption string
 	var run bool
 	run = true
+	generateQueue(database)
 	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Cars\nView Apartments\nQuit")
 	for run {
 		fmt.Println("Please enter an option")
@@ -75,7 +76,9 @@ func viewEntry(database *sql.DB, option string) error {
 		fmt.Println("Type an owner name to view their cars or type 'all' to view all cars")
 		fmt.Scanln(&ownerName)
 		if ownerName == "all" {
+
 			rows, err := database.Query("SELECT CAST(car_id AS varchar),make,model,color,plate FROM cars")
+			defer rows.Close()
 			if err != nil {
 				return err
 			}
@@ -86,6 +89,7 @@ func viewEntry(database *sql.DB, option string) error {
 		} else {
 			query := `SELECT car_id,make,model,color,plate FROM cars WHERE ownerFname=$1;`
 			rows, err := database.Query(query, ownerName)
+			defer rows.Close()
 			if err != nil {
 				return err
 			}
@@ -99,6 +103,7 @@ func viewEntry(database *sql.DB, option string) error {
 		var apartmentName string
 		var apt_id string
 		rows, err := database.Query("SELECT CAST(apt_id AS VARCHAR),apt_name FROM apartments WHERE apt_name NOT NULL")
+		defer rows.Close()
 		if err != nil {
 			return err
 		}
@@ -130,6 +135,15 @@ func addPermit(database *sql.DB) error {
 
 	return nil
 
+}
+func replacePermit(carID string, location string, database *sql.DB) {
+	currentTime := time.Now().Format("01-02-2006 15:04:05")
+	insert, err := database.Prepare("INSERT INTO permits(car_id,active_time,location,active) VALUES(?,?,?,?)")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("Registering car " + carID + " at " + location)
+	insert.Exec(carID, currentTime, location, 1)
 }
 
 func addCar(database *sql.DB) error {
@@ -175,10 +189,11 @@ func generateQueue(database *sql.DB) {
 	//check active permits to validate they are active
 	//look to see if 24 hrs has passed
 	rows, err := database.Query("SELECT permit_id,CAST(active_time AS varchar),car_id,location FROM permits WHERE active=1")
+	defer rows.Close()
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer rows.Close()
+	//	defer rows.Close()
 	for rows.Next() {
 		rows.Scan(&permitID, &permitTime, &carID, &location)
 		if check24hrs(permitTime, currentTime) {
@@ -189,6 +204,7 @@ func generateQueue(database *sql.DB) {
 			permitQueue = append(permitQueue, newEntry)
 		}
 	}
+	//	defer rows.Close()
 	if len(permitQueue) > 0 {
 		executeQueue(permitQueue, database)
 	}
@@ -229,6 +245,14 @@ func executeQueue(permitQueue []permitOrder, database *sql.DB) {
 		runAutoparking(order.location, order.car_id, order.permit_id, database)
 	}
 }
+func deletePermit(database *sql.DB, permit_id string) error {
+	update, err := database.Prepare("DELETE FROM permits WHERE permit_id=?")
+	if err != nil {
+		return err
+	}
+	update.Exec(permit_id)
+	return nil
+}
 
 func runAutoparking(apartment string, carID string, permit_id string, database *sql.DB) {
 	vMake, vModel, vColor, vPlate, vApt, vEmail := "--ma", "--mo", "--co", "--pl", "--apt", "--e"
@@ -239,13 +263,20 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 	var email string
 	var email_id string
 	currentTime := time.Now().Format("01-02-2006 15:04:05")
+
+	//currentTime := time.Now().Format("01-02-2006 15:04:05")
 	//query data base to get vehichle info
+
 	row, _ := database.Query("SELECT email_id,address FROM email WHERE email_id=1")
 	row.Next()
 	row.Scan(&email_id, &email)
+	row.Close()
+	//Can't update after this code block
+
 	rows, _ := database.Query("SELECT make,model,color,plate FROM cars WHERE car_id=" + carID)
 	rows.Next()
 	rows.Scan(&queryMake, &queryModel, &queryColor, &queryPlate)
+	rows.Close()
 
 	//check to make sure a valid entry for a car was returned
 	if queryMake == "" || queryModel == "" || queryColor == "" || queryPlate == "" {
@@ -253,7 +284,15 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 	} else {
 		//run autoparking script with args from db
 		cmd := exec.Command("python", "autoParking.py", vMake, queryMake, vModel, queryModel, vColor, queryColor, vPlate, queryPlate, vApt, apartment, vEmail, email)
-		err := cmd.Start()
+		update, err := database.Prepare("UPDATE permits SET active_time=?,car_id=?,active=1 WHERE permit_id=?")
+		if err != nil {
+			fmt.Println(err)
+		}
+		update.Exec(currentTime, carID, permit_id)
+		//set the permit to active after running auto parking
+		//may add some additonal checking to see if this actually works later
+		//update is broken
+		err = cmd.Start()
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -261,8 +300,5 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 		if err != nil {
 			fmt.Println(err)
 		}
-		//set the permit to active after running auto parking
-		//may add some additonal checking to see if this actually works later
-		database.Exec("UPDATE permits SET active_time=?,active=1 WHERE permit_id=?", currentTime, carID)
 	}
 }

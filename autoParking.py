@@ -102,8 +102,10 @@ def main(argv):
     formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[7]")
     formSubmit.click()
     time.sleep(random.uniform(2.000000,4.988888))
+    time.sleep(random.uniform(2.000000,4.988888))
     formSubmit.click()
-    time.sleep(10)
+    
+    driver.quit
     
 
 if __name__ == "__main__":
