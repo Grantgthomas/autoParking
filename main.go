@@ -32,7 +32,6 @@ func menu(database *sql.DB) {
 	var userOption string
 	var run bool
 	run = true
-	generateQueue(database)
 	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Cars\nView Apartments\nQuit")
 	for run {
 		fmt.Println("Please enter an option")
