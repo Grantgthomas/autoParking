@@ -104,8 +104,9 @@ def main(argv):
     time.sleep(random.uniform(2.000000,4.988888))
     time.sleep(random.uniform(2.000000,4.988888))
     formSubmit.click()
-    
     driver.quit
+    driver.close
+
     
 
 if __name__ == "__main__":
