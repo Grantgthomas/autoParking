@@ -71,41 +71,45 @@ def main(argv):
     plateForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,3,4))
     phoneForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,4,1))
     emailForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,4,2))
-
-    aptForm.send_keys(apartment)
-    firstNameForm.send_keys(values[0])
-    lastNameForm.send_keys(values[1])
-    unitForm.send_keys(values[2])
-    makeForm.send_keys(VMake)
-    modelForm.send_keys(VModel)
-    colorForm.send_keys(VColor)
-    plateForm.send_keys(VPlate)
-    phoneForm.send_keys(values[7])
-    emailForm.send_keys(email)
-    time.sleep(random.uniform(2.000000,4.988888))
     try:
-        aptSelect = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/form/div[1]/div/div/div/ul"))
-        )
-    except:
+        aptForm.send_keys(apartment)
+        firstNameForm.send_keys(values[0])
+        lastNameForm.send_keys(values[1])
+        unitForm.send_keys(values[2])
+        makeForm.send_keys(VMake)
+        modelForm.send_keys(VModel)
+        colorForm.send_keys(VColor)
+        plateForm.send_keys(VPlate)
+        phoneForm.send_keys(values[7])
+        emailForm.send_keys(email)
+        time.sleep(random.uniform(2.000000,4.988888))
+        try:
+            aptSelect = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/form/div[1]/div/div/div/ul"))
+            )
+        except:
+            driver.quit
+        aptSelect.click()
+
+        acceptBox = driver.find_element(by=By.CLASS_NAME, value="checkmark")
+        if (acceptBox.is_selected):
+            print("")
+        else:
+            acceptBox.click()
+
+
+        time.sleep(random.uniform(2.000000,4.988888))
+        formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[7]")
+        formSubmit.click()
+        time.sleep(random.uniform(2.000000,4.988888))
+        time.sleep(random.uniform(2.000000,4.988888))
+        formSubmit.click()
+        time.sleep(10) 
         driver.quit
-    aptSelect.click()
-
-    acceptBox = driver.find_element(by=By.CLASS_NAME, value="checkmark")
-    if (acceptBox.is_selected):
-        print("")
-    else:
-        acceptBox.click()
-
-
-    time.sleep(random.uniform(2.000000,4.988888))
-    formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[7]")
-    formSubmit.click()
-    time.sleep(random.uniform(2.000000,4.988888))
-    time.sleep(random.uniform(2.000000,4.988888))
-    formSubmit.click()
-    driver.quit
-    driver.close
+        driver.close
+    finally:
+        driver.quit
+        driver.close
 
     
 

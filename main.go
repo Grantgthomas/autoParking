@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
+	"os"
 	"os/exec"
 	"strconv"
-
+	"sync"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -22,18 +24,19 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	//var wg sync.WaitGroup
+	var wg sync.WaitGroup
 
-	//	wg.Add(1)
+	wg.Add(1)
 	go autoRegister(database)
 	menu(database)
-	//	wg.Done()
+	wg.Done()
 }
 
 func autoRegister(database *sql.DB) {
 	for {
 		generateQueue(database)
-		time.Sleep(28800)
+		fmt.Println("AutoParking!")
+		time.Sleep(time.Second * 28800)
 	}
 }
 
@@ -41,7 +44,7 @@ func menu(database *sql.DB) {
 	var userOption string
 	var run bool
 	run = true
-	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Cars\nView Apartments\nQuit")
+	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Permits\nView Cars\nView Apartments\nQuit")
 	for run {
 		fmt.Println("Please enter an option")
 		fmt.Scanln(&userOption)
@@ -65,12 +68,51 @@ func menu(database *sql.DB) {
 			if err != nil {
 				fmt.Println(err)
 			}
+		case "vp":
+			err := viewEntry(database, "view perm")
+			if err != nil {
+				fmt.Println(err)
+			}
+		case "dp":
+			err := viewEntry(database, "view perm")
+			if err != nil {
+				fmt.Println(err)
+			}
+			selectPermit(database)
 		case "q":
 			run = false
 		default:
 			println("Invalid Option")
-			println("Valid Options Are:\n(m) make permits\n(ac) add car\n(ap) add permit\n(vc) view cars\n(va) view apartments\n(q) quit")
+			println("Valid Options Are:\n(m) make permits\n(ac) add car\n(ap) add permit\n(vc) view cars\n(vp) view permits\n(va) view apartments\n(q) quit")
 		}
+	}
+}
+
+func selectPermit(database *sql.DB) {
+	stdin := bufio.NewReader(os.Stdin)
+	//get user input for a permit entry to delete
+	var delInput int = 0
+	fmt.Println("Enter the ID of the permit to be deleted")
+	//	fmt.Scanln(&delInput)
+	//validates the input from the user
+	for {
+		_, err := fmt.Fscan(stdin, &delInput)
+		if err == nil {
+			if delInput > 0 {
+				err := deletePermit(database, strconv.Itoa(delInput))
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else if delInput <= 0 {
+				delInput = 0
+				fmt.Println("Please enter a valid ID (Greater than 0 and listed)")
+				fmt.Println(delInput)
+				break
+			}
+
+		}
+		fmt.Println("Please enter a valid ID (Greater than 0 and listed)")
+		break
 	}
 }
 
@@ -137,8 +179,13 @@ func check24hrs(evalTime string, current string) bool {
 }
 
 func executeQueue(permitQueue []permitOrder, database *sql.DB) {
-	for _, order := range permitQueue {
-		runAutoparking(order.location, order.car_id, order.permit_id, database)
+	//validate data in the permit queue before using it
+	for _, permitOrder := range permitQueue {
+		if _, err := strconv.Atoi(permitOrder.car_id); err == nil {
+			runAutoparking(permitOrder.location, permitOrder.car_id, permitOrder.permit_id, database)
+		} else if err != nil {
+			fmt.Printf("CarID number %q is invalid\n", permitOrder.car_id)
+		}
 	}
 }
 
@@ -151,10 +198,9 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 	var email string
 	var email_id string
 	currentTime := time.Now().Format("01-02-2006 15:04:05")
-
 	//currentTime := time.Now().Format("01-02-2006 15:04:05")
 	//query data base to get vehichle info
-
+	//Must validate Car ID
 	row, _ := database.Query("SELECT email_id,address FROM email WHERE email_id=1")
 	row.Next()
 	row.Scan(&email_id, &email)
@@ -192,4 +238,5 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 			fmt.Println(err)
 		}
 	}
+
 }

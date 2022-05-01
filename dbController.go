@@ -128,6 +128,27 @@ func viewEntry(database *sql.DB, option string) error {
 			rows.Scan(&apt_id, &apartmentName)
 			fmt.Println("[" + apt_id + " | " + apartmentName + "]")
 		}
+	} else if option == "view perm" {
+		var permit_id string
+		var car_id string
+		var active_time string
+		var location string
+		var active string
+		rows, err := database.Query("SELECT CAST(permit_id AS VARCHAR),car_id,CAST(active_time AS VARCHAR),location,active FROM permits")
+		defer rows.Close()
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+			rows.Scan(&permit_id, &car_id, &active_time, &location, &active)
+			switch active {
+			case "1":
+				active = "Active"
+			case "0":
+				active = "Inactive"
+			}
+			fmt.Println("[ " + permit_id + " | " + car_id + " | " + active_time + " | " + location + " | " + active + " ]")
+		}
 	}
 	return nil
 }
