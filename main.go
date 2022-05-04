@@ -50,7 +50,7 @@ func menu(database *sql.DB) {
 		fmt.Scanln(&userOption)
 		switch userOption {
 		case "m":
-			generateQueue(database)
+			generateNoCheckQueue(database)
 		case "ac":
 			err := addCar(database)
 			if err != nil {
@@ -147,6 +147,37 @@ func generateQueue(database *sql.DB) {
 		executeQueue(permitQueue, database)
 	}
 }
+
+//generate queue with no 24 hour check
+func generateNoCheckQueue(database *sql.DB) {
+	permitQueue := make([]permitOrder, 0)
+	var permitTime string
+	var permitID string
+	var carID string
+	var location string
+	var newEntry permitOrder
+	//check active permits to validate they are active
+	//look to see if 24 hrs has passed
+	rows, err := database.Query("SELECT permit_id,CAST(active_time AS varchar),car_id,location FROM permits WHERE active=1")
+	defer rows.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+	//	defer rows.Close()
+	for rows.Next() {
+		rows.Scan(&permitID, &permitTime, &carID, &location)
+		newEntry.permit_id = permitID
+		newEntry.car_id = carID
+		newEntry.location = location
+		permitQueue = append(permitQueue, newEntry)
+
+	}
+	//	defer rows.Close()
+	if len(permitQueue) > 0 {
+		executeQueue(permitQueue, database)
+	}
+}
+
 func check24hrs(evalTime string, current string) bool {
 	//check if 24 hours has passed
 	//convert datetime values from SQL database to numerical

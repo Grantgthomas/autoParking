@@ -105,11 +105,19 @@ def main(argv):
         time.sleep(random.uniform(2.000000,4.988888))
         formSubmit.click()
         time.sleep(10) 
-        driver.quit
-        driver.close
+        driver.close()
+        driver.quit()
+        driver.close()
+    except:
+        pass
+    else:
+        driver.close()
+        driver.quit()
     finally:
-        driver.quit
-        driver.close
+        driver.close()
+        driver.quit()
+        driver.close()
+        
 
     
 
