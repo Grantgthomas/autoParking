@@ -3,6 +3,7 @@ from multiprocessing.connection import deliver_challenge, wait
 from operator import truediv
 import sys
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -18,7 +19,7 @@ def main(argv):
     # set path to driver
    
     #set browser to use
-    driver = webdriver.Chrome("C:\Program Files (x86)\chromedriver.exe")
+    driver = webdriver.Chrome(ChromeDriverManager().install())
     #declare a string to represent path to form on website
     FName = "Karolina"
     LName = "Frankfurt"

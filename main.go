@@ -102,6 +102,8 @@ func selectPermit(database *sql.DB) {
 				err := deletePermit(database, strconv.Itoa(delInput))
 				if err != nil {
 					fmt.Println(err)
+				} else {
+					break
 				}
 			} else if delInput <= 0 {
 				delInput = 0
