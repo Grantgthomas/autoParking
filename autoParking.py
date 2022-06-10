@@ -1,7 +1,8 @@
 from decimal import DivisionByZero
-from multiprocessing.connection import deliver_challenge, wait
+from multiprocessing.connection import deliver_challenge
 from operator import truediv
 import sys
+from requests import options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
@@ -9,6 +10,14 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+
 import time
 import random
 import sys
@@ -18,8 +27,26 @@ import getopt
 def main(argv):
     # set path to driver
    
+
+    #Web driver for Docker container
+    #driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", DesiredCapabilities.CHROME,options=set_chrome_options)
+    
+    #set the driver manager
+    #service = ChromeService(executable_path=ChromeDriverManager().install())
+    binary = FirefoxBinary('usr/bin/firefox')
+    service = FirefoxService(executable_path=GeckoDriverManager().install())
+
     #set browser to use
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    #service = Service(executable_path=r"C:\\Users\\gamad\Documents\\Projects\\AutoParking")
+    #driver = webdriver.Chrome(service=service,options=set_chrome_options)
+    
+    #Firefox driver alternative
+    options = Options()
+    options.headless = True
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    driver = webdriver.Firefox(service=service,options=options)
+
+
     #declare a string to represent path to form on website
     FName = "Karolina"
     LName = "Frankfurt"
@@ -60,7 +87,7 @@ def main(argv):
     try:
         aptForm = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/form/div[1]/div/div/div/input")))
     except:
-        driver.quit
+        driver.quit()
 
     aptForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[1]/div/div/div/input")
     firstNameForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,2,1))
@@ -84,12 +111,14 @@ def main(argv):
         phoneForm.send_keys(values[7])
         emailForm.send_keys(email)
         time.sleep(random.uniform(2.000000,4.988888))
-        try:
-            aptSelect = WebDriverWait(driver, 10).until(
+        aptForm.send_keys(" ")
+        aptForm.send_keys(Keys.BACKSPACE)
+        #try:
+        aptSelect = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/form/div[1]/div/div/div/ul"))
             )
-        except:
-            driver.quit
+        #except:
+            #driver.quit()
         aptSelect.click()
 
         acceptBox = driver.find_element(by=By.CLASS_NAME, value="checkmark")
@@ -106,21 +135,32 @@ def main(argv):
         time.sleep(random.uniform(2.000000,4.988888))
         formSubmit.click()
         time.sleep(10) 
-        driver.close()
         driver.quit()
-        driver.close()
+        #driver.quit()
     except:
         pass
-    else:
-        driver.close()
-        driver.quit()
     finally:
-        driver.close()
         driver.quit()
-        driver.close()
-        
+        #driver.quit()        
 
     
+def set_chrome_options():
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_prefs = {}
+    chrome_options.experimental_options["prefs"] = chrome_prefs
+    chrome_prefs["profile.default_content_settings"] = {"images": 2}
+    return chrome_options
+
+def set_firefox_options():
+    firefox_options = Options()
+    firefox_options.add_argument("--headless")
+    firefox_options.add_argument("--no-sandbox")
+    firefox_options.add_argument("--disable-dev-shm-usage")    
+    return firefox_options
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])

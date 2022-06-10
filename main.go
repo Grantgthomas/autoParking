@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"database/sql"
+	_ "encoding/json"
 	"fmt"
+	_ "net/http"
 	"os"
 	"os/exec"
 	"strconv"
@@ -19,24 +21,29 @@ type permitOrder struct {
 	car_id    string
 }
 
+var database *sql.DB
+
 func main() {
 	database, err := sql.Open("sqlite3", "./autos.db")
 	if err != nil {
 		fmt.Println(err)
-	}
-	var wg sync.WaitGroup
+	} else {
+		var wg sync.WaitGroup
 
-	wg.Add(1)
-	go autoRegister(database)
-	menu(database)
-	wg.Done()
+		wg.Add(1)
+		go autoRegister(database)
+		go handleRequest()
+		menu(database)
+		wg.Done()
+	}
 }
 
 func autoRegister(database *sql.DB) {
 	for {
 		generateQueue(database)
-		fmt.Println("AutoParking!")
-		time.Sleep(time.Second * 28800)
+		currentTime := time.Now()
+		fmt.Println("AutoParking! - " + currentTime.String())
+		time.Sleep(time.Second * 3600)
 	}
 }
 
@@ -250,7 +257,7 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 		fmt.Println("Invalid Car choice")
 	} else {
 		//run autoparking script with args from db
-		cmd := exec.Command("python", "autoParking.py", vMake, queryMake, vModel, queryModel, vColor, queryColor, vPlate, queryPlate, vApt, apartment, vEmail, email)
+		cmd := exec.Command("python3", "autoParking.py", vMake, queryMake, vModel, queryModel, vColor, queryColor, vPlate, queryPlate, vApt, apartment, vEmail, email)
 		update, err := database.Prepare("UPDATE permits SET active_time=?,car_id=?,active=1 WHERE permit_id=?")
 		if err != nil {
 			fmt.Println(err)
@@ -272,4 +279,24 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 		}
 	}
 
+}
+
+func genQueueFunc() {
+	generateNoCheckQueue(database)
+}
+
+func viewPermFunc() error {
+	err := viewEntry(database, "view cars")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func viewCarFunc() error {
+	err := viewEntry(database, "view cars")
+	if err != nil {
+		return err
+	}
+	return nil
 }
