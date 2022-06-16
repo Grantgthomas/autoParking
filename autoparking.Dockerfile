@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:latest
+FROM golang:1.18
 
 WORKDIR /usr/local/bin/app
 
@@ -12,26 +12,25 @@ COPY *.py ./
 COPY autos.db ./
 COPY autoParking ./
 
-
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
-RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+#RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+#RUN sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
 RUN apt-get -y update
 RUN apt-get upgrade -y
 
 
-RUN apt-get install -y google-chrome-stable
+#RUN apt-get install -y google-chrome-stable
 
 
 
 RUN apt-get install -y python3
-RUN apt-get install -y python
+#RUN apt-get install -y python
 RUN apt-get install -y python3-pip
 #RUN apt-get install -y python-pip
 
 
-RUN apt-get install -yqq unzip
-RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
-RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
+#RUN apt-get install -yqq unzip
+#RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
+#RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 ENV DISPLAY=:99
 
 RUN pip install --upgrade pip
@@ -50,4 +49,4 @@ RUN apt-get install -y --no-install-recommends firefox
 
 #CMD ["sleep","3600"]
 RUN go build -o autoParking .
-CMD ["/usr/local/bin/app/autoParking"]
+CMD ["./autoParking"]

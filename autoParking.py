@@ -1,7 +1,9 @@
 from decimal import DivisionByZero
+from lib2to3.pgen2.driver import Driver
 from multiprocessing.connection import deliver_challenge
 from operator import truediv
 import sys
+from typing import final
 from requests import options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -84,21 +86,27 @@ def main(argv):
         #Load input forms
     driver.get("https://app.parkingbadge.com/#/guest")
 
-    try:
-        aptForm = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/form/div[1]/div/div/div/input")))
+    """try:
+        aptForm = WebDriverWait(driver, 10).until(EC.presence_of_element_located(By.XPATH,value='//*[@id="input-46"]'))
+        aptForm.send_keys(apartment)
+        aptSelect = driver.find_element(by=By.XPATH, value='//*[@id="list-item-52-0"]')
+        aptSelect.click()
     except:
-        driver.quit()
+        driver.quit()"""
 
-    aptForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[1]/div/div/div/input")
-    firstNameForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,2,1))
-    lastNameForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,2,2))
-    unitForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,2,3))
-    makeForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,3,1))
-    modelForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,3,2))
-    colorForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,3,3))
-    plateForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,3,4))
-    phoneForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,4,1))
-    emailForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,4,2))
+    
+    #firstNameForm = driver.find_element(by=By.XPATH, value="/html/body/div/div[{}]/form/div[{}]/div/div[{}]/div/div/input".format(2,2,1))
+    #time.sleep(10)
+    aptForm = driver.find_element(By.XPATH,value='//*[@id="input-46"]')
+    firstNameForm = driver.find_element(by=By.XPATH, value='//*[@id="input-21"]')
+    lastNameForm = driver.find_element(by=By.XPATH, value='//*[@id="input-24"]')
+    unitForm = driver.find_element(by=By.XPATH, value='//*[@id="input-27"]')
+    makeForm = driver.find_element(by=By.XPATH, value='//*[@id="input-30"]')
+    modelForm = driver.find_element(by=By.XPATH, value='//*[@id="input-33"]')
+    colorForm = driver.find_element(by=By.XPATH, value='//*[@id="input-36"]')
+    plateForm = driver.find_element(by=By.XPATH, value='//*[@id="input-39"]')
+    #phoneForm = driver.find_element(by=By.XPATH, value='//*[@id="input-42"]')
+    emailForm = driver.find_element(by=By.XPATH, value='//*[@id="input-42"]')
     try:
         aptForm.send_keys(apartment)
         firstNameForm.send_keys(values[0])
@@ -108,38 +116,28 @@ def main(argv):
         modelForm.send_keys(VModel)
         colorForm.send_keys(VColor)
         plateForm.send_keys(VPlate)
-        phoneForm.send_keys(values[7])
+        #phoneForm.send_keys(values[7])
         emailForm.send_keys(email)
         time.sleep(random.uniform(2.000000,4.988888))
         aptForm.send_keys(" ")
         aptForm.send_keys(Keys.BACKSPACE)
-        #try:
-        aptSelect = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/form/div[1]/div/div/div/ul"))
+        try:
+            aptSelect = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, "/html/body/div/div[2]/div/div/div"))
             )
-        #except:
-            #driver.quit()
+        except:
+            driver.quit()
         aptSelect.click()
-
-        acceptBox = driver.find_element(by=By.CLASS_NAME, value="checkmark")
-        if (acceptBox.is_selected):
-            print("")
-        else:
-            acceptBox.click()
-
-
         time.sleep(random.uniform(2.000000,4.988888))
-        formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[2]/form/div[7]")
+        formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[1]/main/div/div/div[2]/div[2]/div[5]/button")
         formSubmit.click()
-        time.sleep(random.uniform(2.000000,4.988888))
-        time.sleep(random.uniform(2.000000,4.988888))
+        time.sleep(random.uniform(1,2))
+        formSubmit = driver.find_element(by=By.XPATH, value="/html/body/div/div[1]/main/div/div/div[3]/div[2]/div[2]/button[1]")
         formSubmit.click()
-        time.sleep(10) 
-        driver.quit()
-        #driver.quit()
     except:
         pass
     finally:
+        print("test")
         driver.quit()
         #driver.quit()        
 
@@ -156,7 +154,7 @@ def set_chrome_options():
 
 def set_firefox_options():
     firefox_options = Options()
-    firefox_options.add_argument("--headless")
+    #firefox_options.add_argument("--headless")
     firefox_options.add_argument("--no-sandbox")
     firefox_options.add_argument("--disable-dev-shm-usage")    
     return firefox_options

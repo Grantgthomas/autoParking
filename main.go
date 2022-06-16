@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"database/sql"
 	_ "encoding/json"
 	"fmt"
+	"net/http"
 	_ "net/http"
 	"os"
 	"os/exec"
@@ -22,77 +24,100 @@ type permitOrder struct {
 }
 
 var database *sql.DB
+var srv *http.Server
 
 func main() {
+
 	database, err := sql.Open("sqlite3", "./autos.db")
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		var wg sync.WaitGroup
-
-		wg.Add(1)
-		go autoRegister(database)
-		go handleRequest()
-		menu(database)
+		wg.Add(2)
+		go startHttpServer(&wg)
+		go menu(database, srv)
+		wg.Wait()
 		wg.Done()
 	}
+
 }
 
-func autoRegister(database *sql.DB) {
-	for {
+func autoRegister(database *sql.DB, run <-chan bool, wg *sync.WaitGroup) {
+	running := <-run
+	for running {
 		generateQueue(database)
 		currentTime := time.Now()
 		fmt.Println("AutoParking! - " + currentTime.String())
-		time.Sleep(time.Second * 3600)
+		time.Sleep(time.Second * 60)
 	}
+	wg.Done()
 }
 
-func menu(database *sql.DB) {
+func menu(database *sql.DB, srv *http.Server) {
 	var userOption string
-	var run bool
-	run = true
+	run := true
 	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Permits\nView Cars\nView Apartments\nQuit")
-	for run {
-		fmt.Println("Please enter an option")
-		fmt.Scanln(&userOption)
-		switch userOption {
-		case "m":
-			generateNoCheckQueue(database)
-		case "ac":
-			err := addCar(database)
-			if err != nil {
-				fmt.Println(err)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	runChan := make(chan bool, 1)
+	go func() {
+		for run {
+			fmt.Println("Please enter an option")
+			fmt.Scanln(&userOption)
+			switch userOption {
+			case "m":
+				generateNoCheckQueue(database)
+			case "ac":
+				err := addCar(database)
+				if err != nil {
+					fmt.Println(err)
+				}
+			case "ap":
+				addPermit(database)
+			case "vc":
+				err := viewEntry(database, "view cars")
+				if err != nil {
+					fmt.Println(err)
+				}
+			case "va":
+				err := viewEntry(database, "view apartments")
+				if err != nil {
+					fmt.Println(err)
+				}
+			case "vp":
+				err := viewEntry(database, "view perm")
+				if err != nil {
+					fmt.Println(err)
+				}
+			case "dp":
+				err := viewEntry(database, "view perm")
+				if err != nil {
+					fmt.Println(err)
+				}
+				selectPermit(database)
+			case "q":
+				runChan <- false
+				run = false
+				srv.Shutdown(context.TODO())
+
+			default:
+				println("Invalid Option")
+				println("Valid Options Are:\n(m) make permits\n(ac) add car\n(ap) add permit\n(vc) view cars\n(vp) view permits\n(va) view apartments\n(q) quit")
 			}
-		case "ap":
-			addPermit(database)
-		case "vc":
-			err := viewEntry(database, "view cars")
-			if err != nil {
-				fmt.Println(err)
-			}
-		case "va":
-			err := viewEntry(database, "view apartments")
-			if err != nil {
-				fmt.Println(err)
-			}
-		case "vp":
-			err := viewEntry(database, "view perm")
-			if err != nil {
-				fmt.Println(err)
-			}
-		case "dp":
-			err := viewEntry(database, "view perm")
-			if err != nil {
-				fmt.Println(err)
-			}
-			selectPermit(database)
-		case "q":
-			run = false
-		default:
-			println("Invalid Option")
-			println("Valid Options Are:\n(m) make permits\n(ac) add car\n(ap) add permit\n(vc) view cars\n(vp) view permits\n(va) view apartments\n(q) quit")
 		}
+		wg.Done()
+	}()
+	for run {
+		func(database *sql.DB, runChan <-chan bool) {
+			generateQueue(database)
+			currentTime := time.Now()
+			fmt.Println("AutoParking! - " + currentTime.String())
+		}(database, runChan)
+		time.Sleep(time.Second * 60)
 	}
+	//wg.Wait()
+	//wg.Done()
+	//close(runChan)
 }
 
 func selectPermit(database *sql.DB) {
@@ -158,7 +183,7 @@ func generateQueue(database *sql.DB) {
 }
 
 //generate queue with no 24 hour check
-func generateNoCheckQueue(database *sql.DB) {
+func generateNoCheckQueue(database *sql.DB) error {
 	permitQueue := make([]permitOrder, 0)
 	var permitTime string
 	var permitID string
@@ -170,7 +195,7 @@ func generateNoCheckQueue(database *sql.DB) {
 	rows, err := database.Query("SELECT permit_id,CAST(active_time AS varchar),car_id,location FROM permits WHERE active=1")
 	defer rows.Close()
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	//	defer rows.Close()
 	for rows.Next() {
@@ -185,6 +210,7 @@ func generateNoCheckQueue(database *sql.DB) {
 	if len(permitQueue) > 0 {
 		executeQueue(permitQueue, database)
 	}
+	return nil
 }
 
 func check24hrs(evalTime string, current string) bool {
@@ -257,7 +283,7 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 		fmt.Println("Invalid Car choice")
 	} else {
 		//run autoparking script with args from db
-		cmd := exec.Command("python3", "autoParking.py", vMake, queryMake, vModel, queryModel, vColor, queryColor, vPlate, queryPlate, vApt, apartment, vEmail, email)
+		cmd := exec.Command("python", "autoParking.py", vMake, queryMake, vModel, queryModel, vColor, queryColor, vPlate, queryPlate, vApt, apartment, vEmail, email)
 		update, err := database.Prepare("UPDATE permits SET active_time=?,car_id=?,active=1 WHERE permit_id=?")
 		if err != nil {
 			fmt.Println(err)
@@ -281,8 +307,8 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 
 }
 
-func genQueueFunc() {
-	generateNoCheckQueue(database)
+func genQueueFunc(wg *sync.WaitGroup) error {
+	return generateNoCheckQueue(database)
 }
 
 func viewPermFunc() error {
