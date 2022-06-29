@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -59,11 +60,13 @@ func menu(database *sql.DB, srv *http.Server) {
 	fmt.Println("Welcome to Autoparking. Would you like to: \nMake Permits\nAdd Cars\nRegister Permit\nView Permits\nView Cars\nView Apartments\nQuit")
 	var wg sync.WaitGroup
 	wg.Add(1)
+	reader := bufio.NewReader(os.Stdin)
 	runChan := make(chan bool, 1)
 	go func() {
 		for run {
 			fmt.Println("Please enter an option")
-			fmt.Scanln(&userOption)
+			userOption, _ = reader.ReadString('\n')
+			userOption = strings.Replace(userOption, "\n", "", -1)
 			switch userOption {
 			case "m":
 				generateNoCheckQueue(database)
@@ -283,7 +286,7 @@ func runAutoparking(apartment string, carID string, permit_id string, database *
 		fmt.Println("Invalid Car choice")
 	} else {
 		//run autoparking script with args from db
-		cmd := exec.Command("python", "autoParking.py", vMake, queryMake, vModel, queryModel, vColor, queryColor, vPlate, queryPlate, vApt, apartment, vEmail, email)
+		cmd := exec.Command("python3", "autoParking.py", vMake, queryMake, vModel, queryModel, vColor, queryColor, vPlate, queryPlate, vApt, apartment, vEmail, email)
 		update, err := database.Prepare("UPDATE permits SET active_time=?,car_id=?,active=1 WHERE permit_id=?")
 		if err != nil {
 			fmt.Println(err)

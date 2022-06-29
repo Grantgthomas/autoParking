@@ -48,5 +48,5 @@ RUN apt-get install -y --no-install-recommends firefox
 
 
 #CMD ["sleep","3600"]
-RUN go build -o autoParking .
+RUN go build -o autoParking
 CMD ["./autoParking"]
